@@ -1,3 +1,4 @@
+// Copyright 2026 maksimpopulov
 #include "Automata.h"
 #include <iostream>
 #include <thread>
@@ -5,7 +6,8 @@
 
 Automata::Automata()
     : cash(0), state(STATES::OFF), selectedDrinkIndex(-1) {
-    menu = { "Эспрессо", "Американо", "Капучино", "Латте", "Горячий шоколад", "Чай" };
+    menu = { "Эспрессо", "Американо", "Капучино", "Латте",
+            "Горячий шоколад", "Чай" };
     prices = { 80, 100, 120, 130, 110, 70 };
 }
 
@@ -30,7 +32,7 @@ void Automata::off() {
         std::cout << "Автомат выключен" << std::endl;
     }
     else {
-        std::cout << "Невозможно выключить автомат в текущем состоянии" << std::endl;
+        std::cout << "Невозможно выключить в текущем состоянии" << std::endl;
     }
 }
 
@@ -39,25 +41,28 @@ void Automata::coin(int amount) {
         std::cout << "Введите положительную сумму" << std::endl;
         return;
     }
-
     if (state == STATES::WAIT) {
         cash = amount;
         state = STATES::ACCEPT;
-        std::cout << "Внесено " << amount << " руб. Состояние: Приём денег" << std::endl;
+        std::cout << "Внесено " << amount << " руб. Состояние: Приём денег"
+            << std::endl;
     }
     else if (state == STATES::ACCEPT) {
         cash += amount;
-        std::cout << "Добавлено " << amount << " руб. Всего: " << cash << " руб." << std::endl;
+        std::cout << "Добавлено " << amount << " руб. Всего: "
+            << cash << " руб." << std::endl;
     }
     else {
-        std::cout << "Невозможно внести деньги в текущем состоянии" << std::endl;
+        std::cout << "Невозможно внести деньги в текущем состоянии"
+            << std::endl;
     }
 }
 
 std::vector<std::string> Automata::getMenu() {
     std::cout << "\n=== МЕНЮ ===" << std::endl;
     for (size_t i = 0; i < menu.size(); ++i) {
-        std::cout << i + 1 << ". " << menu[i] << " - " << prices[i] << " руб." << std::endl;
+        std::cout << i + 1 << ". " << menu[i] << " - "
+            << prices[i] << " руб." << std::endl;
     }
     return menu;
 }
@@ -68,15 +73,14 @@ STATES Automata::getState() {
 
 bool Automata::choice(int index) {
     if (state != STATES::ACCEPT) {
-        std::cout << "Выбор напитка доступен только в состоянии 'Приём денег'" << std::endl;
+        std::cout << "Выбор напитка доступен только в состоянии "
+            << "'Приём денег'" << std::endl;
         return false;
     }
-
     if (index < 1 || index > static_cast<int>(menu.size())) {
         std::cout << "Неверный номер напитка" << std::endl;
         return false;
     }
-
     selectedDrinkIndex = index - 1;
     state = STATES::CHECK;
     std::cout << "Выбран напиток: " << menu[selectedDrinkIndex]
@@ -86,18 +90,21 @@ bool Automata::choice(int index) {
 
 bool Automata::check() {
     if (state != STATES::CHECK) {
-        std::cout << "Проверка доступна только в состоянии 'Проверка наличности'" << std::endl;
+        std::cout << "Проверка доступна только в состоянии "
+            << "'Проверка наличности'" << std::endl;
         return false;
     }
-
     if (cash >= prices[selectedDrinkIndex]) {
-        std::cout << "Средств достаточно. Начинаем приготовление..." << std::endl;
+        std::cout << "Средств достаточно. Начинаем приготовление..."
+            << std::endl;
         return true;
     }
     else {
         std::cout << "Недостаточно средств. Внесено: " << cash
-            << " руб., требуется: " << prices[selectedDrinkIndex] << " руб." << std::endl;
-        std::cout << "Вернитесь в состояние 'Приём денег' и внесите недостающую сумму" << std::endl;
+            << " руб., требуется: " << prices[selectedDrinkIndex]
+            << " руб." << std::endl;
+        std::cout << "Вернитесь в состояние 'Приём денег' и внесите "
+            << "недостающую сумму" << std::endl;
         state = STATES::ACCEPT;
         return false;
     }
@@ -114,7 +121,8 @@ void Automata::cancel() {
         std::cout << "Сеанс отменён. Состояние: Ожидание" << std::endl;
     }
     else if (state == STATES::COOK) {
-        std::cout << "Невозможно отменить - напиток уже готовится" << std::endl;
+        std::cout << "Невозможно отменить - напиток уже готовится"
+            << std::endl;
     }
     else {
         std::cout << "Отмена недоступна в текущем состоянии" << std::endl;
@@ -123,10 +131,10 @@ void Automata::cancel() {
 
 void Automata::cook() {
     if (state != STATES::CHECK) {
-        std::cout << "Приготовление доступно только после проверки средств" << std::endl;
+        std::cout << "Приготовление доступно только после проверки средств"
+            << std::endl;
         return;
     }
-
     if (cash >= prices[selectedDrinkIndex]) {
         cash -= prices[selectedDrinkIndex];
         state = STATES::COOK;
@@ -152,7 +160,8 @@ void Automata::finish() {
         std::cout << "Спасибо за покупку! Состояние: Ожидание" << std::endl;
     }
     else {
-        std::cout << "Завершение обслуживания доступно только после приготовления" << std::endl;
+        std::cout << "Завершение обслуживания доступно только "
+            << "после приготовления" << std::endl;
     }
 }
 
@@ -160,7 +169,8 @@ int Automata::getCash() const {
     return cash;
 }
 
-void Automata::loadMenu(const std::vector<std::string>& drinks, const std::vector<int>& costs) {
+void Automata::loadMenu(const std::vector<std::string>& drinks,
+    const std::vector<int>& costs) {
     if (drinks.size() == costs.size()) {
         menu = drinks;
         prices = costs;
