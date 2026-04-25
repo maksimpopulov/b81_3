@@ -1,6 +1,5 @@
 // Copyright 2022 GHA Test Team
-
-#include <gtest/gtest.h>
+// Copyright 2026 maksimpopulov
 #include "Automata.h"
 #include <cassert>
 #include <iostream>
@@ -54,7 +53,8 @@ void testCheckInsufficientFunds() {
     bool hasMoney = a.check();
     assert(!hasMoney);
     assert(a.getState() == STATES::ACCEPT);
-    std::cout << "✓ Тест 5 пройден: Проверка недостаточности средств" << std::endl;
+    std::cout << "✓ Тест 5 пройден: Проверка недостаточности средств"
+        << std::endl;
 }
 
 void testCookSuccess() {
@@ -64,7 +64,7 @@ void testCookSuccess() {
     a.choice(1);
     a.cook();
     assert(a.getState() == STATES::COOK);
-    assert(a.getCash() == 20); 
+    assert(a.getCash() == 20);
     std::cout << "✓ Тест 6 пройден: Успешное приготовление" << std::endl;
 }
 
@@ -96,37 +96,39 @@ void testChoiceWrongState() {
     bool result = a.choice(1);
     assert(!result);
     assert(a.getState() == STATES::WAIT);
-    std::cout << "✓ Тест 9 пройден: Выбор напитка в неправильном состоянии" << std::endl;
+    std::cout << "✓ Тест 9 пройден: Выбор в неправильном состоянии"
+        << std::endl;
 }
 
 void testFullCycle() {
     Automata a;
-    a.on();                         
-    a.coin(150);                    
-    a.choice(2);                   
+    a.on();
+    a.coin(150);
+    a.choice(2);
     assert(a.getState() == STATES::CHECK);
-    a.cook();                       
+    a.cook();
     assert(a.getState() == STATES::COOK);
-    a.finish();                    
+    a.finish();
     assert(a.getState() == STATES::WAIT);
-    assert(a.getCash() == 50);     
-    std::cout << "✓ Тест 10 пройден: Полный цикл работы автомата" << std::endl;
+    assert(a.getCash() == 50);
+    std::cout << "✓ Тест 10 пройден: Полный цикл работы" << std::endl;
 }
 
 void testAddMoneyAfterInsufficient() {
     Automata a;
     a.on();
-    a.coin(60);              
-    a.choice(3);                
-    a.cook();                      
+    a.coin(60);
+    a.choice(3);
+    a.cook();
     assert(a.getState() == STATES::ACCEPT);
-    a.coin(70);                    
-    a.choice(3);                
-    a.cook();                      
+    a.coin(70);
+    a.choice(3);
+    a.cook();
     assert(a.getState() == STATES::COOK);
     a.finish();
-    assert(a.getCash() == 10);      
-    std::cout << "✓ Тест 11 пройден: Добавление денег после недостатка" << std::endl;
+    assert(a.getCash() == 10);
+    std::cout << "✓ Тест 11 пройден: Добавление денег после недостатка"
+        << std::endl;
 }
 
 void testGetMenu() {
@@ -135,27 +137,4 @@ void testGetMenu() {
     assert(menu.size() == 6);
     assert(menu[0] == "Эспрессо");
     std::cout << "✓ Тест 12 пройден: Получение меню" << std::endl;
-}
-
-int main() {
-    std::cout << "Запуск модульных тестов..." << std::endl;
-    std::cout << "=========================" << std::endl;
-
-    testOn();
-    testOff();
-    testCoin();
-    testInvalidChoice();
-    testCheckInsufficientFunds();
-    testCookSuccess();
-    testCancel();
-    testFinish();
-    testChoiceWrongState();
-    testFullCycle();
-    testAddMoneyAfterInsufficient();
-    testGetMenu();
-
-    std::cout << "=========================" << std::endl;
-    std::cout << "Все тесты успешно пройдены!" << std::endl;
-
-    return 0;
 }
