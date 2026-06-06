@@ -1,5 +1,6 @@
 // Copyright 2026 maksimpopulov
 #include <gtest/gtest.h>
+#include <string>
 #include "Automata.h"
 
 TEST(Testmach, TurnOnFromOff) {
@@ -33,7 +34,7 @@ TEST(Testmach, CancelDuringAcceptResetsCash) {
 TEST(Testmach, EnoughMoneyForCoffee) {
     Automata a;
     a.on();
-    a.coin(80);
+    a.coin(2.0);
     EXPECT_TRUE(a.check(1));
 }
 
