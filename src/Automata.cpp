@@ -5,6 +5,8 @@
 #include <sstream>
 #include <thread>
 #include <chrono>
+#include <string>
+#include <vector>
 
 Automata::Automata() : cash(0.0), state(STATES::OFF) {
   menu = {"Tea", "Coffee", "Hot Chocolate", "Milk"};
