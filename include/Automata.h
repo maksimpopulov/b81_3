@@ -1,42 +1,44 @@
 // Copyright 2026 maksimpopulov
-#ifndef INCLUDE_AUTOMATA_H_
-#define INCLUDE_AUTOMATA_H_
+#ifndef AUTOMATA_H
+#define AUTOMATA_H
 
 #include <string>
 #include <vector>
 
 enum class STATES {
     OFF,
+    ON,
     WAIT,
     ACCEPT,
     CHECK,
-    COOK
+    COOK,
+    CANCEL,
+    FINISH
 };
 
 class Automata {
- private:
-    int cash;
+private:
+    double cash;
     std::vector<std::string> menu;
-    std::vector<int> prices;
+    std::vector<double> prices;
     STATES state;
-    int selectedDrinkIndex;
 
- public:
+public:
     Automata();
     void on();
     void off();
-    void coin(int amount);
-    std::vector<std::string> getMenu();
+    void coin(double amount);
+    std::string getMenu();
     STATES getState();
-    bool choice(int index);
-    bool check();
+    bool choice(int drinkIndex);
+    bool check(int drinkIndex);
     void cancel();
-    void cook();
-    void finish();
-
-    int getCash() const;
-    void loadMenu(const std::vector<std::string>& drinks,
-        const std::vector<int>& costs);
+    void cook(int drinkIndex);
+    double finish();
+    void loadMenuFromFile(const std::string& filename);
+    void setMenu(const std::vector<std::string>& newMenu,
+        const std::vector<double>& newPrices);
+    double getCash() const;
 };
 
-#endif  // INCLUDE_AUTOMATA_H_
+#endif
