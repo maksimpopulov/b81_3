@@ -3,43 +3,37 @@
 #include <iostream>
 
 int main() {
-    std::cout << "=== Демонстрация работы автомата ===" << std::endl;
+  Automata automata;
 
-    Automata automata;
+  automata.on();
+  std::cout << automata.getMenu();
 
-    automata.on();
+  automata.coin(1.0);
+  automata.coin(0.5);
 
-    automata.getMenu();
-
-    automata.coin(150);
-
-    automata.choice(2);
-
-    automata.cook();
-
+  if (automata.choice(1)) {
+    automata.cook(1);
     automata.finish();
+  }
 
-    std::cout << "\n=== Второй сценарий: отмена операции ===" << std::endl;
+  std::cout << "\n--- New customer ---\n";
 
-    Automata automata2;
-    automata2.on();
-    automata2.getMenu();
-    automata2.coin(50);
-    automata2.choice(4);
-    automata2.cancel();
+  automata.coin(3.0);
+  std::cout << automata.getMenu();
 
-    std::cout << "\n=== Третий сценарий: недостаточно средств ==="
-        << std::endl;
+  if (automata.choice(2)) {
+    automata.cook(2);
+    automata.finish();
+  }
 
-    Automata automata3;
-    automata3.on();
-    automata3.coin(60);
-    automata3.choice(3);
-    automata3.cook();
-    automata3.coin(70);
-    automata3.choice(3);
-    automata3.cook();
-    automata3.finish();
+  std::cout << "\n--- Test cancellation ---\n";
 
-    return 0;
+  automata.coin(1.5);
+  automata.cancel();
+
+  std::cout << "\n--- Shutting down ---\n";
+
+  automata.off();
+
+  return 0;
 }
