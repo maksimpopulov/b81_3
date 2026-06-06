@@ -1,140 +1,151 @@
-// Copyright 2022 GHA Test Team
 // Copyright 2026 maksimpopulov
+#include <gtest/gtest.h>
 #include "Automata.h"
-#include <cassert>
-#include <iostream>
 
-void testOn() {
-    Automata a;
-    assert(a.getState() == STATES::OFF);
-    a.on();
-    assert(a.getState() == STATES::WAIT);
-    std::cout << "✓ Тест 1 пройден: Включение автомата" << std::endl;
-}
-
-void testOff() {
+TEST(Testmach, TurnOnFromOff) {
     Automata a;
     a.on();
-    a.coin(100);
-    a.off();
-    assert(a.getState() == STATES::ACCEPT);
-    a.cancel();
-    a.off();
-    assert(a.getState() == STATES::OFF);
-    std::cout << "✓ Тест 2 пройден: Выключение автомата" << std::endl;
+    EXPECT_EQ(a.getState(), STATES::ON);
 }
 
-void testCoin() {
+TEST(Testmach, InitialCashIsZero) {
+    Automata a;
+    EXPECT_DOUBLE_EQ(a.getCash(), 0.0);
+}
+
+TEST(Testmach, InvalidChoiceIgnored) {
     Automata a;
     a.on();
     a.coin(100);
-    assert(a.getState() == STATES::ACCEPT);
-    assert(a.getCash() == 100);
-    a.coin(50);
-    assert(a.getCash() == 150);
-    std::cout << "✓ Тест 3 пройден: Внесение денег" << std::endl;
+    EXPECT_FALSE(a.choice(99));
+    EXPECT_EQ(a.getState(), STATES::ACCEPT);
 }
 
-void testInvalidChoice() {
-    Automata a;
-    a.on();
-    a.coin(100);
-    bool result = a.choice(10);
-    assert(!result);
-    assert(a.getState() == STATES::ACCEPT);
-    std::cout << "✓ Тест 4 пройден: Неверный выбор напитка" << std::endl;
-}
-
-void testCheckInsufficientFunds() {
-    Automata a;
-    a.on();
-    a.coin(50);
-    a.choice(1);
-    bool hasMoney = a.check();
-    assert(!hasMoney);
-    assert(a.getState() == STATES::ACCEPT);
-    std::cout << "✓ Тест 5 пройден: Проверка недостаточности средств"
-        << std::endl;
-}
-
-void testCookSuccess() {
-    Automata a;
-    a.on();
-    a.coin(100);
-    a.choice(1);
-    a.cook();
-    assert(a.getState() == STATES::COOK);
-    assert(a.getCash() == 20);
-    std::cout << "✓ Тест 6 пройден: Успешное приготовление" << std::endl;
-}
-
-void testCancel() {
-    Automata a;
-    a.on();
-    a.coin(100);
-    a.cancel();
-    assert(a.getState() == STATES::WAIT);
-    assert(a.getCash() == 0);
-    std::cout << "✓ Тест 7 пройден: Отмена операции" << std::endl;
-}
-
-void testFinish() {
-    Automata a;
-    a.on();
-    a.coin(100);
-    a.choice(1);
-    a.cook();
-    a.finish();
-    assert(a.getState() == STATES::WAIT);
-    assert(a.getCash() == 0);
-    std::cout << "✓ Тест 8 пройден: Завершение обслуживания" << std::endl;
-}
-
-void testChoiceWrongState() {
-    Automata a;
-    a.on();
-    bool result = a.choice(1);
-    assert(!result);
-    assert(a.getState() == STATES::WAIT);
-    std::cout << "✓ Тест 9 пройден: Выбор в неправильном состоянии"
-        << std::endl;
-}
-
-void testFullCycle() {
+TEST(Testmach, CancelDuringAcceptResetsCash) {
     Automata a;
     a.on();
     a.coin(150);
-    a.choice(2);
-    assert(a.getState() == STATES::CHECK);
-    a.cook();
-    assert(a.getState() == STATES::COOK);
-    a.finish();
-    assert(a.getState() == STATES::WAIT);
-    assert(a.getCash() == 50);
-    std::cout << "✓ Тест 10 пройден: Полный цикл работы" << std::endl;
+    a.cancel();
+    EXPECT_DOUBLE_EQ(a.getCash(), 0.0);
+    EXPECT_EQ(a.getState(), STATES::ON);
 }
 
-void testAddMoneyAfterInsufficient() {
+TEST(Testmach, EnoughMoneyForCoffee) {
     Automata a;
     a.on();
-    a.coin(60);
-    a.choice(3);
-    a.cook();
-    assert(a.getState() == STATES::ACCEPT);
-    a.coin(70);
-    a.choice(3);
-    a.cook();
-    assert(a.getState() == STATES::COOK);
-    a.finish();
-    assert(a.getCash() == 10);
-    std::cout << "✓ Тест 11 пройден: Добавление денег после недостатка"
-        << std::endl;
+    a.coin(80);
+    EXPECT_TRUE(a.check(1));
 }
 
-void testGetMenu() {
+TEST(Testmach, CoinInsertionIncreasesCash) {
     Automata a;
-    auto menu = a.getMenu();
-    assert(menu.size() == 6);
-    assert(menu[0] == "Эспрессо");
-    std::cout << "✓ Тест 12 пройден: Получение меню" << std::endl;
+    a.on();
+    a.coin(1.5);
+    EXPECT_DOUBLE_EQ(a.getCash(), 1.5);
+    EXPECT_EQ(a.getState(), STATES::ACCEPT);
+}
+
+TEST(Testmach, DoubleCoinInsertion) {
+    Automata a;
+    a.on();
+    a.coin(1.0);
+    a.coin(0.5);
+    EXPECT_DOUBLE_EQ(a.getCash(), 1.5);
+    EXPECT_EQ(a.getState(), STATES::ACCEPT);
+}
+
+TEST(Testmach, OffWhileHavingCashReturnsMoney) {
+    Automata a;
+    a.on();
+    a.coin(2.5);
+    a.off();
+    EXPECT_DOUBLE_EQ(a.getCash(), 0.0);
+    EXPECT_EQ(a.getState(), STATES::OFF);
+}
+
+TEST(Testmach, ChoiceWithoutMoney) {
+    Automata a;
+    a.on();
+    EXPECT_FALSE(a.choice(0));
+    EXPECT_EQ(a.getState(), STATES::ON);
+}
+
+TEST(Testmach, SuccessfulPurchaseFlow) {
+    Automata a;
+    a.on();
+    a.coin(2.0);
+    EXPECT_TRUE(a.choice(0));
+    EXPECT_EQ(a.getState(), STATES::COOK);
+    a.cook(0);
+    EXPECT_EQ(a.getState(), STATES::FINISH);
+    double change = a.finish();
+    EXPECT_DOUBLE_EQ(change, 1.0);
+    EXPECT_EQ(a.getState(), STATES::ON);
+    EXPECT_DOUBLE_EQ(a.getCash(), 0.0);
+}
+
+TEST(Testmach, InsufficientFundsForDrink) {
+    Automata a;
+    a.on();
+    a.coin(0.8);
+    EXPECT_FALSE(a.choice(1));
+    EXPECT_EQ(a.getState(), STATES::ACCEPT);
+    EXPECT_DOUBLE_EQ(a.getCash(), 0.8);
+}
+
+TEST(Testmach, GetMenuNotEmpty) {
+    Automata a;
+    std::string menu = a.getMenu();
+    EXPECT_FALSE(menu.empty());
+    EXPECT_NE(menu.find("Tea"), std::string::npos);
+    EXPECT_NE(menu.find("Coffee"), std::string::npos);
+}
+
+TEST(Testmach, InvalidCoinAmountIgnored) {
+    Automata a;
+    a.on();
+    a.coin(-5.0);
+    EXPECT_DOUBLE_EQ(a.getCash(), 0.0);
+    EXPECT_EQ(a.getState(), STATES::ON);
+}
+
+TEST(Testmach, CancelWithoutMoney) {
+    Automata a;
+    a.on();
+    a.cancel();
+    EXPECT_EQ(a.getState(), STATES::ON);
+    EXPECT_DOUBLE_EQ(a.getCash(), 0.0);
+}
+
+TEST(Testmach, CookWithoutChoice) {
+    Automata a;
+    a.on();
+    a.coin(2.0);
+    a.cook(0);
+    EXPECT_NE(a.getState(), STATES::FINISH);
+    EXPECT_EQ(a.getState(), STATES::ACCEPT);
+}
+
+TEST(Testmach, TurnOnWhenAlreadyOn) {
+    Automata a;
+    a.on();
+    a.on();
+    EXPECT_EQ(a.getState(), STATES::ON);
+}
+
+TEST(Testmach, TurnOffWhenAlreadyOff) {
+    Automata a;
+    a.off();
+    EXPECT_EQ(a.getState(), STATES::OFF);
+}
+
+TEST(Testmach, ExactPaymentNoChange) {
+    Automata a;
+    a.on();
+    a.coin(1.0);
+    EXPECT_TRUE(a.choice(0));
+    a.cook(0);
+    double change = a.finish();
+    EXPECT_DOUBLE_EQ(change, 0.0);
+    EXPECT_DOUBLE_EQ(a.getCash(), 0.0);
 }
